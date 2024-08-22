@@ -44,6 +44,7 @@ import io.getstream.chat.android.models.querysort.QuerySortByField
 import io.getstream.live.shopping.ui.component.LiveShoppingLoadingIndicator
 import io.getstream.live.shopping.ui.feature.channels.LiveShoppingChannels
 import io.getstream.live.shopping.ui.feature.liveshopping.LiveShoppingScreen
+import io.getstream.video.android.model.StreamCallId
 
 @Composable
 fun LiveShoppingNavHost(
@@ -92,11 +93,14 @@ fun LiveShoppingNavHost(
         )
       }
 
+      val rawId = StreamCallId.fromCallCid(root.cid).id
+
       val listViewModel: MessageListViewModel = viewModel(factory = factory)
       val composerViewModel: MessageComposerViewModel = viewModel(factory = factory)
 
       LiveShoppingScreen(
         isHost = root.isHost,
+        streamId = rawId,
         listViewModel = listViewModel,
         composerViewModel = composerViewModel
       )

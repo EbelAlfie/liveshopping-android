@@ -56,13 +56,12 @@ class StreamChatInitializer : Initializer<Unit> {
       .logLevel(logLevel)
       .build()
 
-    val user = User(
-      id = "skydoves",
-      name = "skydoves"
+    val chatUser = User(
+      id = myId,
+      name = myName
     )
-
-    val token = chatClient.devToken(user.id)
-    chatClient.connectUser(user, token).enqueue()
+    val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2FjaW5nIn0.6bCbPSmbCAyrt8M3G3nzJ3tGw9-1tpTfKLUaTjG4Onk"
+    chatClient.connectUser(chatUser, myToken).enqueue()
   }
 
   override fun dependencies(): List<Class<out Initializer<*>>> =

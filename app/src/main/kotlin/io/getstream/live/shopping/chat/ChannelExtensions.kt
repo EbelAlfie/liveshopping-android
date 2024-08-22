@@ -53,6 +53,9 @@ internal object ChannelConst {
   const val EXTRA_POINTS_NAME = "EXTRA_POINTS_NAME"
 }
 
+
+val livestreamId = "streamer"
+
 suspend fun ChatClient.createMockChannels() {
   createChannel(
     channelType = "livestream",
@@ -72,7 +75,7 @@ suspend fun ChatClient.createMockChannels() {
 suspend fun ChatClient.createStreamerChannel(): Channel? {
   return createChannel(
     channelType = "livestream",
-    channelId = "streamer",
+    channelId = livestreamId,
     memberIds = listOf(ChatClient.instance().getCurrentUser()?.id.orEmpty()),
     extraData = mockChannel3Extras
   ).await().getOrNull()

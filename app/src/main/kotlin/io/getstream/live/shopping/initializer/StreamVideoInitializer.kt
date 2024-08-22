@@ -30,16 +30,15 @@ class StreamVideoInitializer : Initializer<Unit> {
   override fun create(context: Context) {
     streamLog { "StreamVideoInitializer is initialized" }
 
-    val userId = "jaewoong"
     StreamVideoBuilder(
       context = context,
       apiKey = BuildConfig.STREAM_API_KEY,
       notificationConfig = NotificationConfig(hideRingingNotificationInForeground = true),
       runForegroundServiceForCalls = false,
-      token = StreamVideo.devToken(userId),
+      token = myToken,
       user = User(
-        id = userId,
-        name = "Jaewoong",
+        id = myId,
+        name = myName,
         image = "http://placekitten.com/200/300",
         role = "admin"
       )

@@ -44,6 +44,7 @@ import io.getstream.chat.android.compose.viewmodel.messages.MessageComposerViewM
 import io.getstream.chat.android.compose.viewmodel.messages.MessageListViewModel
 import io.getstream.chat.android.ui.common.state.messages.list.MessageItemState
 import io.getstream.live.shopping.R
+import io.getstream.live.shopping.chat.livestreamId
 import io.getstream.video.android.compose.permission.LaunchCallPermissions
 import io.getstream.video.android.compose.ui.components.livestream.LivestreamPlayer
 import io.getstream.video.android.compose.ui.components.video.VideoRenderer
@@ -53,6 +54,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LiveShoppingScreen(
   isHost: Boolean,
+  streamId: String,
   listViewModel: MessageListViewModel,
   composerViewModel: MessageComposerViewModel,
   livestreamViewModel: LiveShoppingViewModel = hiltViewModel()
@@ -62,7 +64,7 @@ fun LiveShoppingScreen(
   val scope = rememberCoroutineScope()
   EnsureVideoCallPermissions {
     scope.launch {
-      livestreamViewModel.joinCall(type = "livestream", id = "streamer")
+      livestreamViewModel.joinCall(type = "livestream", id = streamId)
     }
   }
 
