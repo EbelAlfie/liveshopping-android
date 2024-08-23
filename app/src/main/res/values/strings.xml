@@ -26,6 +26,7 @@
   <string name="livestream_live_started">Livestream has been started!</string>
   <string name="livestream_live_end">Livestream has been ended. Bye bye~</string>
   <string name="livestream_joining_failed">Failed to join this livestream channel.</string>
+  <string name="livestream_joined_message">Just joined the live</string>
   <string name="follow">Follow</string>
   <string name="buy">Buy</string>
 </resources>

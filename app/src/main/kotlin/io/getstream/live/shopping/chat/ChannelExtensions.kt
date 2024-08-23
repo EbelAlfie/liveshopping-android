@@ -18,6 +18,7 @@ package io.getstream.live.shopping.chat
 
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.Channel
+import io.getstream.live.shopping.CredentialsHost
 import kotlin.random.Random
 
 val Channel.streamerAvatarLink: String?
@@ -53,9 +54,6 @@ internal object ChannelConst {
   const val EXTRA_POINTS_NAME = "EXTRA_POINTS_NAME"
 }
 
-
-val livestreamId = "streamer"
-
 suspend fun ChatClient.createMockChannels() {
   createChannel(
     channelType = "livestream",
@@ -75,7 +73,7 @@ suspend fun ChatClient.createMockChannels() {
 suspend fun ChatClient.createStreamerChannel(): Channel? {
   return createChannel(
     channelType = "livestream",
-    channelId = livestreamId,
+    channelId = CredentialsHost.LIVE_STREAM_ID,
     memberIds = listOf(ChatClient.instance().getCurrentUser()?.id.orEmpty()),
     extraData = mockChannel3Extras
   ).await().getOrNull()
@@ -107,12 +105,11 @@ private val mockChannel2Extras: Map<String, Any>
 
 private val mockChannel3Extras: Map<String, Any>
   inline get() = mapOf(
-    ChannelConst.EXTRA_STREAMER_AVATAR_LINK to "https://placekitten.com/200/300",
-    ChannelConst.EXTRA_STREAMER_NAME to "Streamer",
-    ChannelConst.EXTRA_STREAM_PREVIEW_LINK to "https://github.com/user-attachments/assets/" +
-      "3ae6e3c5-b1fc-4a5f-9774-33dc724d0d74",
-    ChannelConst.EXTRA_DESCRIPTION to "Come watch an awesome fruits!",
-    ChannelConst.EXTRA_TAGS to listOf("Livestreaming", "Fruits", "Sales", "Discount", "Apple"),
+    ChannelConst.EXTRA_STREAMER_AVATAR_LINK to CredentialsHost.AVATAR,
+    ChannelConst.EXTRA_STREAMER_NAME to CredentialsHost.NAME,
+    ChannelConst.EXTRA_STREAM_PREVIEW_LINK to CredentialsHost.BANNER,
+    ChannelConst.EXTRA_DESCRIPTION to CredentialsHost.DESCRIPTION,
+    ChannelConst.EXTRA_TAGS to listOf("Livestreaming", "Food", "Sales", "Discount", "Indonesian"),
     ChannelConst.EXTRA_POINTS_ICON to "https://cdn.betterttv.net/emote/60ee7ce38ed8b373e4222366/1x",
     ChannelConst.EXTRA_POINTS_NAME to "Buns"
   )

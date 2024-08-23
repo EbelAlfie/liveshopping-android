@@ -24,5 +24,8 @@ sealed interface LiveShoppingScreen {
   data object Channels : LiveShoppingScreen
 
   @Serializable
+  data object ChannelCreation: LiveShoppingScreen
+
+  @Serializable
   data class LiveShopping(val cid: String, val isHost: Boolean) : LiveShoppingScreen
 }

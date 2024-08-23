@@ -18,23 +18,33 @@ package io.getstream.live.shopping.ui.feature.liveshopping
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,8 +53,10 @@ import io.getstream.chat.android.compose.ui.theme.ChatTheme
 import io.getstream.chat.android.compose.viewmodel.messages.MessageComposerViewModel
 import io.getstream.chat.android.compose.viewmodel.messages.MessageListViewModel
 import io.getstream.chat.android.ui.common.state.messages.list.MessageItemState
+import io.getstream.live.shopping.CredentialsHost
+import io.getstream.live.shopping.ProductModel
 import io.getstream.live.shopping.R
-import io.getstream.live.shopping.chat.livestreamId
+import io.getstream.live.shopping.ui.component.products.BottomSheet
 import io.getstream.video.android.compose.permission.LaunchCallPermissions
 import io.getstream.video.android.compose.ui.components.livestream.LivestreamPlayer
 import io.getstream.video.android.compose.ui.components.video.VideoRenderer
@@ -54,7 +66,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun LiveShoppingScreen(
   isHost: Boolean,
-  streamId: String,
   listViewModel: MessageListViewModel,
   composerViewModel: MessageComposerViewModel,
   livestreamViewModel: LiveShoppingViewModel = hiltViewModel()
@@ -64,7 +75,7 @@ fun LiveShoppingScreen(
   val scope = rememberCoroutineScope()
   EnsureVideoCallPermissions {
     scope.launch {
-      livestreamViewModel.joinCall(type = "livestream", id = streamId)
+      livestreamViewModel.joinCall(type = "livestream", id = CredentialsHost.LIVE_STREAM_ID)
     }
   }
 
@@ -79,7 +90,8 @@ fun LiveShoppingScreen(
     isHost = isHost,
     listViewModel = listViewModel,
     composerViewModel = composerViewModel,
-    uiState = uiState
+    uiState = uiState,
+    livestreamViewModel = livestreamViewModel
   )
 }
 
@@ -88,8 +100,10 @@ private fun LivestreamStreamerContent(
   isHost: Boolean,
   listViewModel: MessageListViewModel,
   composerViewModel: MessageComposerViewModel,
-  uiState: LiveShoppingUiState
+  uiState: LiveShoppingUiState,
+  livestreamViewModel: LiveShoppingViewModel
 ) {
+  val bannerUiState by livestreamViewModel.bannerUiState.collectAsState()
   when (uiState) {
     is LiveShoppingUiState.Success -> {
       StreamRenderer(
@@ -97,7 +111,10 @@ private fun LivestreamStreamerContent(
         call = uiState.call,
         isHost = isHost,
         listViewModel = listViewModel,
-        composerViewModel = composerViewModel
+        composerViewModel = composerViewModel,
+        productList = livestreamViewModel.productList,
+        bannerUiState = bannerUiState,
+        onPinProductClicked = livestreamViewModel::pinProduct
       )
     }
 
@@ -133,10 +150,25 @@ private fun StreamRenderer(
   modifier: Modifier,
   call: Call,
   isHost: Boolean,
+  productList: List<ProductModel>,
   listViewModel: MessageListViewModel,
-  composerViewModel: MessageComposerViewModel
+  composerViewModel: MessageComposerViewModel,
+  bannerUiState: ProductBannerUiState,
+  onPinProductClicked: (String, Call) -> Unit
 ) {
+  val context = LocalContext.current
+  var rtmpData by remember { mutableStateOf<RtmpData?>(null) }
+
   LaunchCallPermissions(call = call)
+
+  LaunchedEffect(Unit) {
+    if (!isHost) {
+      composerViewModel.sendMessage(
+        composerViewModel.buildNewMessage(context.getString(R.string.livestream_joined_message))
+      )
+      call.speaker.setEnabled(enabled = true, fromUser = true)
+    }
+  }
 
   val localParticipant by call.state.localParticipant.collectAsState()
   val video = localParticipant?.video?.collectAsState()?.value
@@ -158,8 +190,22 @@ private fun StreamRenderer(
     bottomBar = {
       LiveShoppingBottomBar(
         messages = messages,
+        isHost = isHost,
         listViewModel = listViewModel,
-        composerViewModel = composerViewModel
+        composerViewModel = composerViewModel,
+        productList = productList,
+        bannerUiState = bannerUiState,
+        onPinProductClicked = {
+          onPinProductClicked(it, call)
+        },
+        onShareClicked = {
+          rtmpData = RtmpData(
+            url = call.state.ingress.value?.rtmp?.address ?: "",
+            streamKey = call.state.ingress.value?.rtmp?.streamKey ?: ""
+          )
+          call.state.ingress.value?.rtmp?.address
+
+        }
       )
     }
   ) {
@@ -183,5 +229,31 @@ private fun StreamRenderer(
     } else {
       LivestreamPlayer(call = call, overlayContent = {})
     }
+
+    rtmpData?.let {
+      BottomSheet(onDismiss = { rtmpData = null }) {
+        SelectionContainer {
+          Column {
+
+            Text(
+              text = it.url,
+              fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+              text = it.streamKey,
+              fontWeight = FontWeight.Bold
+            )
+          }
+        }
+      }
+    }
+
   }
 }
+
+
+data class RtmpData(
+  val url: String,
+  val streamKey: String
+)

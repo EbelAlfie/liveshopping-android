@@ -17,19 +17,30 @@
 package io.getstream.live.shopping.ui.feature.liveshopping
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.getstream.live.shopping.ProductModel
+import io.getstream.live.shopping.products
 import io.getstream.video.android.core.Call
 import io.getstream.video.android.core.StreamVideo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import org.openapitools.client.models.CustomVideoEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class LiveShoppingViewModel @Inject constructor() : ViewModel() {
 
+  val EXTRA_PRODUCT_ID = "EXTRA_PRODUCT_ID"
+
   private val liveShoppingUiStateMutableState =
     MutableStateFlow<LiveShoppingUiState>(LiveShoppingUiState.Loading)
   val liveShoppingUiState: StateFlow<LiveShoppingUiState> = liveShoppingUiStateMutableState
+
+  val bannerUiState = MutableStateFlow<ProductBannerUiState>(ProductBannerUiState.Idle)
+
+  val productList: List<ProductModel> = products
 
   suspend fun joinCall(type: String, id: String) {
     val streamVideo = StreamVideo.instance()
@@ -50,9 +61,31 @@ class LiveShoppingViewModel @Inject constructor() : ViewModel() {
     }
     val result = call.join(create = true)
     result.onSuccess {
+      subscribePinnedProduct(call)
       liveShoppingUiStateMutableState.value = LiveShoppingUiState.Success(call)
     }.onError {
       liveShoppingUiStateMutableState.value = LiveShoppingUiState.Error
+    }
+  }
+
+  fun pinProduct(productId: String, call: Call) {
+    viewModelScope.launch{
+      call.sendCustomEvent(
+        mapOf(EXTRA_PRODUCT_ID to productId)
+      )
+    }
+  }
+
+  private fun subscribePinnedProduct(call: Call) {
+    viewModelScope.launch {
+      call.subscribeFor(CustomVideoEvent::class.java) {
+        val customEvent = it as? CustomVideoEvent ?: return@subscribeFor
+        productList.find { prod -> prod.id == customEvent.custom.getOrDefault(EXTRA_PRODUCT_ID, "") }?.let { pinned ->
+          bannerUiState.value = ProductBannerUiState.Pinned(
+            productData = pinned
+          )
+        }
+      }
     }
   }
 
@@ -65,7 +98,17 @@ sealed interface LiveShoppingUiState {
 
   data object Loading : LiveShoppingUiState
 
-  data class Success(val call: Call) : LiveShoppingUiState
+  data class Success(
+    val call: Call
+  ) : LiveShoppingUiState
 
   data object Error : LiveShoppingUiState
+}
+
+sealed interface ProductBannerUiState {
+  data object Idle: ProductBannerUiState
+
+  data class Pinned(
+    val productData: ProductModel
+  ): ProductBannerUiState
 }

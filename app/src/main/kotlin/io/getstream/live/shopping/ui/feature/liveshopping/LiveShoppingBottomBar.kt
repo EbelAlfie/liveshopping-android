@@ -16,7 +16,6 @@
 
 package io.getstream.live.shopping.ui.feature.liveshopping
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,48 +26,52 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.placeholder.shimmer.Shimmer
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import io.getstream.chat.android.compose.ui.components.composer.InputField
-import io.getstream.chat.android.compose.ui.theme.ChatTheme
 import io.getstream.chat.android.compose.viewmodel.messages.MessageComposerViewModel
 import io.getstream.chat.android.compose.viewmodel.messages.MessageListViewModel
-import io.getstream.chat.android.models.Channel
 import io.getstream.chat.android.models.Message
 import io.getstream.chat.android.ui.common.state.messages.list.MessageItemState
+import io.getstream.live.shopping.ProductModel
 import io.getstream.live.shopping.R
 import io.getstream.live.shopping.chat.ChannelConst.EXTRA_DESCRIPTION
 import io.getstream.live.shopping.chat.ChannelConst.EXTRA_STREAMER_NAME
 import io.getstream.live.shopping.chat.ChannelConst.EXTRA_STREAM_PREVIEW_LINK
-import io.getstream.live.shopping.ui.component.StreamButton
-import io.getstream.live.shopping.ui.theme.shimmerBase
-import io.getstream.live.shopping.ui.theme.shimmerHighlight
+import io.getstream.live.shopping.products
+import io.getstream.live.shopping.ui.component.products.BottomSheet
+import io.getstream.live.shopping.ui.component.products.ProductBanner
+import io.getstream.live.shopping.ui.component.products.ProductList
 import io.getstream.video.android.compose.theme.VideoTheme
 
 @Composable
 internal fun LiveShoppingBottomBar(
   messages: List<MessageItemState>,
+  isHost: Boolean,
   listViewModel: MessageListViewModel,
-  composerViewModel: MessageComposerViewModel
+  composerViewModel: MessageComposerViewModel,
+  productList: List<ProductModel>,
+  bannerUiState: ProductBannerUiState,
+  onPinProductClicked: (String) -> Unit,
+  onShareClicked: () -> Unit
 ) {
   Column(
     modifier = Modifier
@@ -79,76 +82,29 @@ internal fun LiveShoppingBottomBar(
   ) {
     ChatOverly(messages = messages)
 
-    ProductBanner(channel = listViewModel.channel)
+    when (bannerUiState) {
+      is ProductBannerUiState.Pinned ->
+        ProductBanner(
+          image = bannerUiState.productData.image, //listViewModel.channel.extraData[EXTRA_STREAM_PREVIEW_LINK].toString(),
+          name = bannerUiState.productData.name, //listViewModel.channel.extraData[EXTRA_STREAMER_NAME].toString(),
+          description = bannerUiState.productData.desc, //listViewModel.channel.extraData[EXTRA_DESCRIPTION].toString()
+        )
+
+      else ->
+        ProductBanner(
+          image = listViewModel.channel.extraData[EXTRA_STREAM_PREVIEW_LINK].toString(),
+          name = listViewModel.channel.extraData[EXTRA_STREAMER_NAME].toString(),
+          description = listViewModel.channel.extraData[EXTRA_DESCRIPTION].toString()
+        )
+    }
 
     ChatInput(
       cid = listViewModel.channel.cid,
-      messageComposerViewModel = composerViewModel
-    )
-  }
-}
-
-@Composable
-private fun ProductBanner(
-  channel: Channel
-) {
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .background(
-        color = ChatTheme.colors.appBackground.copy(alpha = 0.85f),
-        shape = RoundedCornerShape(16.dp)
-      )
-      .padding(12.dp),
-    verticalAlignment = Alignment.CenterVertically
-  ) {
-    GlideImage(
-      modifier = Modifier
-        .size(76.dp)
-        .clip(RoundedCornerShape(16.dp)),
-      imageModel = { channel.extraData[EXTRA_STREAM_PREVIEW_LINK].toString() },
-      component = rememberImageComponent {
-        +ShimmerPlugin(
-          Shimmer.Resonate(
-            baseColor = shimmerBase,
-            highlightColor = shimmerHighlight
-          )
-        )
-      }
-    )
-
-    Column(
-      modifier = Modifier.padding(6.dp),
-      verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-      Text(
-        text = channel.extraData[EXTRA_STREAMER_NAME].toString(),
-        color = ChatTheme.colors.textHighEmphasis,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
-      )
-
-      Text(
-        text = channel.extraData[EXTRA_DESCRIPTION].toString(),
-        color = ChatTheme.colors.textLowEmphasis,
-        fontWeight = FontWeight.Bold,
-        fontSize = 12.sp
-      )
-
-      Text(
-        text = "$79.99",
-        color = VideoTheme.colors.brandRed,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
-      )
-    }
-
-    StreamButton(
-      modifier = Modifier
-        .padding(start = 16.dp)
-        .height(36.dp),
-      text = stringResource(R.string.buy),
-      onClick = {}
+      isHost = isHost,
+      messageComposerViewModel = composerViewModel,
+      onPinProductClicked = onPinProductClicked,
+      productList = productList,
+      onShareClicked = onShareClicked
     )
   }
 }
@@ -156,9 +112,14 @@ private fun ProductBanner(
 @Composable
 private fun ChatInput(
   cid: String,
-  messageComposerViewModel: MessageComposerViewModel
+  isHost: Boolean,
+  productList: List<ProductModel>,
+  messageComposerViewModel: MessageComposerViewModel,
+  onPinProductClicked: (String) -> Unit,
+  onShareClicked: () -> Unit
 ) {
   val (text, changeText) = remember { mutableStateOf("") }
+  var showBottomSheet by remember { mutableStateOf<Boolean?>(null) }
 
   Row(
     modifier = Modifier
@@ -167,11 +128,15 @@ private fun ChatInput(
       .padding(bottom = 12.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    Icon(
-      imageVector = Icons.Default.ShoppingBag,
-      tint = VideoTheme.colors.brandYellow,
-      contentDescription = null
-    )
+    IconButton(onClick = {
+      showBottomSheet = true
+    }) {
+      Icon(
+        imageVector = Icons.Default.ShoppingBag,
+        tint = VideoTheme.colors.brandYellow,
+        contentDescription = null
+      )
+    }
 
     InputField(
       modifier = Modifier
@@ -189,10 +154,7 @@ private fun ChatInput(
     Icon(
       modifier = Modifier.clickable(enabled = text.isNotEmpty()) {
         messageComposerViewModel.sendMessage(
-          message = Message(
-            cid = cid,
-            text = text
-          )
+          message = messageComposerViewModel.buildNewMessage(text)
         )
         changeText.invoke("")
       },
@@ -204,5 +166,21 @@ private fun ChatInput(
       },
       contentDescription = null
     )
+
+    IconButton(onClick = onShareClicked) {
+      Icon(painter = painterResource(id = R.drawable.baseline_share_24), contentDescription = null)
+    }
   }
+
+  showBottomSheet?.let {
+    if (it)
+      BottomSheet(onDismiss = { showBottomSheet = false }) {
+        ProductList(
+          products = productList,
+          isHost = isHost,
+          onItemSelected = onPinProductClicked
+        ) //dari mapi (?)
+      }
+  }
+
 }

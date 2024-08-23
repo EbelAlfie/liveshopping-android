@@ -25,6 +25,8 @@ import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFacto
 import io.getstream.chat.android.state.plugin.config.StatePluginConfig
 import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 import io.getstream.live.shopping.BuildConfig
+import io.getstream.live.shopping.CredentialsAudience
+import io.getstream.live.shopping.CredentialsHost
 import io.getstream.log.streamLog
 
 /**
@@ -56,13 +58,33 @@ class StreamChatInitializer : Initializer<Unit> {
       .logLevel(logLevel)
       .build()
 
-    val chatUser = User(
-      id = myId,
-      name = myName
-    )
-    val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2FjaW5nIn0.6bCbPSmbCAyrt8M3G3nzJ3tGw9-1tpTfKLUaTjG4Onk"
-    chatClient.connectUser(chatUser, myToken).enqueue()
+    if (BuildConfig.HOST) {
+      setCredentialAsHost(chatClient)
+    } else {
+      setCredentialAsAudience(chatClient)
+    }
   }
+
+  private fun setCredentialAsAudience(chatClient: ChatClient) {
+    val user = User(
+      id = CredentialsAudience.ID,
+      name = CredentialsAudience.NAME
+    )
+
+//    val token = chatClient.devToken(user.id)
+    chatClient.connectUser(user, CredentialsAudience.TOKEN).enqueue()
+  }
+
+  private fun setCredentialAsHost(chatClient: ChatClient) {
+    val user = User(
+      id = CredentialsHost.ID,
+      name = CredentialsHost.NAME
+    )
+
+//    val token = chatClient.devToken(user.id)
+    chatClient.connectUser(user, CredentialsHost.TOKEN).enqueue()
+  }
+
 
   override fun dependencies(): List<Class<out Initializer<*>>> =
     listOf(StreamLogInitializer::class.java)

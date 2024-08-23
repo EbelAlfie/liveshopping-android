@@ -89,6 +89,7 @@ internal fun LiveShoppingTopBar(
         onClick = {
           scope.launch {
             if (backstage) {
+              call.microphone.setEnabled(enabled = true, fromUser = true)
               call.goLive()
 
               val message = composerViewModel.buildNewMessage(
@@ -98,6 +99,7 @@ internal fun LiveShoppingTopBar(
               composerViewModel.sendMessage(message)
             } else {
               call.stopLive()
+              call.microphone.setEnabled(enabled = false, fromUser = true)
 
               val message = composerViewModel.buildNewMessage(
                 message = context.getString(R.string.livestream_live_end)

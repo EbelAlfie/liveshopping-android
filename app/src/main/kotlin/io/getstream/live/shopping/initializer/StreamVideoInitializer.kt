@@ -19,8 +19,9 @@ package io.getstream.live.shopping.initializer
 import android.content.Context
 import androidx.startup.Initializer
 import io.getstream.live.shopping.BuildConfig
+import io.getstream.live.shopping.CredentialsAudience
+import io.getstream.live.shopping.CredentialsHost
 import io.getstream.log.streamLog
-import io.getstream.video.android.core.StreamVideo
 import io.getstream.video.android.core.StreamVideoBuilder
 import io.getstream.video.android.core.notifications.NotificationConfig
 import io.getstream.video.android.model.User
@@ -29,18 +30,43 @@ class StreamVideoInitializer : Initializer<Unit> {
 
   override fun create(context: Context) {
     streamLog { "StreamVideoInitializer is initialized" }
+    if (BuildConfig.HOST) {
+      setCredentialAsHost(context)
+    } else {
+      setCredentialAsAudience(context)
+    }
+  }
 
+  private fun setCredentialAsAudience(context: Context) {
     StreamVideoBuilder(
       context = context,
       apiKey = BuildConfig.STREAM_API_KEY,
       notificationConfig = NotificationConfig(hideRingingNotificationInForeground = true),
       runForegroundServiceForCalls = false,
-      token = myToken,
+//      token = StreamVideo.devToken(userId),
+      token = CredentialsAudience.TOKEN,
       user = User(
-        id = myId,
-        name = myName,
-        image = "http://placekitten.com/200/300",
-        role = "admin"
+        id = CredentialsAudience.ID,
+        name = CredentialsAudience.NAME,
+        image = CredentialsAudience.AVATAR,
+        role = CredentialsAudience.ROLE
+      )
+    ).build()
+  }
+
+  private fun setCredentialAsHost(context: Context) {
+    StreamVideoBuilder(
+      context = context,
+      apiKey = BuildConfig.STREAM_API_KEY,
+      notificationConfig = NotificationConfig(hideRingingNotificationInForeground = true),
+      runForegroundServiceForCalls = false,
+//      token = StreamVideo.devToken(userId),
+      token = CredentialsHost.TOKEN,
+      user = User(
+        id = CredentialsHost.ID,
+        name = CredentialsHost.NAME,
+        image = CredentialsHost.AVATAR,
+        role = CredentialsHost.ROLE
       )
     ).build()
   }

@@ -19,13 +19,17 @@ package io.getstream.live.shopping.ui.component
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import io.getstream.chat.android.compose.ui.theme.ChatTheme
+import io.getstream.live.shopping.R
 import io.getstream.live.shopping.ui.preview.DefaultPreview
 
 @Composable
@@ -48,6 +52,26 @@ fun StreamButton(
     Text(
       text = text,
       color = Color.White
+    )
+  }
+}
+
+@Composable
+fun PinButton(
+  modifier: Modifier = Modifier,
+  contentColor: Color = ChatTheme.colors.primaryAccent,
+  enabled: Boolean = true,
+  onClick: () -> Unit
+) {
+  IconButton(
+    modifier = modifier,
+    enabled = enabled,
+    onClick = onClick,
+  ) {
+    Icon(
+      painter = painterResource(R.drawable.baseline_add_circle_outline_24),
+      contentDescription = null,
+      tint = contentColor
     )
   }
 }
