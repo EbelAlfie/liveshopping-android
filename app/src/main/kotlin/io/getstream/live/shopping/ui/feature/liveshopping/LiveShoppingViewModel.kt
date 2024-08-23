@@ -30,17 +30,16 @@ import org.openapitools.client.models.CustomVideoEvent
 import javax.inject.Inject
 
 @HiltViewModel
-class LiveShoppingViewModel @Inject constructor() : ViewModel() {
-
+class LiveShoppingViewModel @Inject constructor(
+) : ViewModel() {
   val EXTRA_PRODUCT_ID = "EXTRA_PRODUCT_ID"
+  val productList: List<ProductModel> = products
 
   private val liveShoppingUiStateMutableState =
     MutableStateFlow<LiveShoppingUiState>(LiveShoppingUiState.Loading)
   val liveShoppingUiState: StateFlow<LiveShoppingUiState> = liveShoppingUiStateMutableState
 
   val bannerUiState = MutableStateFlow<ProductBannerUiState>(ProductBannerUiState.Idle)
-
-  val productList: List<ProductModel> = products
 
   suspend fun joinCall(type: String, id: String) {
     val streamVideo = StreamVideo.instance()
@@ -92,23 +91,4 @@ class LiveShoppingViewModel @Inject constructor() : ViewModel() {
   override fun onCleared() {
     super.onCleared()
   }
-}
-
-sealed interface LiveShoppingUiState {
-
-  data object Loading : LiveShoppingUiState
-
-  data class Success(
-    val call: Call
-  ) : LiveShoppingUiState
-
-  data object Error : LiveShoppingUiState
-}
-
-sealed interface ProductBannerUiState {
-  data object Idle: ProductBannerUiState
-
-  data class Pinned(
-    val productData: ProductModel
-  ): ProductBannerUiState
 }

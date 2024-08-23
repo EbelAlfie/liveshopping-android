@@ -66,6 +66,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LiveShoppingScreen(
   isHost: Boolean,
+  streamId: String,
   listViewModel: MessageListViewModel,
   composerViewModel: MessageComposerViewModel,
   livestreamViewModel: LiveShoppingViewModel = hiltViewModel()
@@ -75,7 +76,7 @@ fun LiveShoppingScreen(
   val scope = rememberCoroutineScope()
   EnsureVideoCallPermissions {
     scope.launch {
-      livestreamViewModel.joinCall(type = "livestream", id = CredentialsHost.LIVE_STREAM_ID)
+      livestreamViewModel.joinCall(type = "livestream", id = streamId)
     }
   }
 

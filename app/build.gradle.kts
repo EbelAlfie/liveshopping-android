@@ -20,8 +20,8 @@ android {
     versionCode = 1
     versionName = "1.0"
 
-//    buildConfigField("boolean","HOST", "true")
-    buildConfigField("boolean","HOST", "false")
+    buildConfigField("boolean","HOST", "true")
+//    buildConfigField("boolean","HOST", "false")
   }
 
   buildTypes {
