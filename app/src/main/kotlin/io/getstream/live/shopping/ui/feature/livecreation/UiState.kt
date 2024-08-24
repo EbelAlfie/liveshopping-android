@@ -1,29 +1,26 @@
 package io.getstream.live.shopping.ui.feature.livecreation
 
-import io.getstream.live.shopping.ui.feature.model.BroadcastData
 import io.getstream.video.android.core.Call
 
-sealed interface StreamModeUiState {
-  data class Internal(
+sealed interface CreationUiState {
+
+  data class Success(
     val call: Call,
-  ) : StreamModeUiState
+    val streamMode: StreamMode = StreamMode.Internal
+  ) : CreationUiState
 
-  data class External(
-    val call: Call
-  ) : StreamModeUiState
+  data object Loading: CreationUiState
 
-  data object Loading: StreamModeUiState
+  data class Error(val error: Throwable): CreationUiState
 
-  data class Error(val error: Throwable): StreamModeUiState
-
-  fun getIndex(): Int = when (this) {
-    is External -> 1
-    else -> 0
-  }
-
+  fun getTabIndex() =
+    when (this) {
+      is Success -> streamMode.ordinal
+      else -> 0
+    }
 }
 
-enum class StreamChooseEvent {
+enum class StreamMode {
   Internal,
   External
 }

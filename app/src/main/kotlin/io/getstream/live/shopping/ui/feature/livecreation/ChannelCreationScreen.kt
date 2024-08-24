@@ -18,6 +18,7 @@ import io.getstream.live.shopping.R
 import io.getstream.live.shopping.ui.component.StreamButton
 import io.getstream.live.shopping.ui.component.StreamTab
 import io.getstream.live.shopping.ui.component.UrlText
+import io.getstream.live.shopping.ui.feature.livecreation.StreamMode.External
 import io.getstream.live.shopping.ui.navigation.LiveShoppingScreen
 import io.getstream.live.shopping.ui.navigation.currentComposeNavigator
 
@@ -44,20 +45,27 @@ fun ChannelCreationScreen(
 
     UrlText(
       modifier = Modifier.weight(1F),
-      url = (uiState as? StreamModeUiState.External)?.broadcast?.ingressUrl ?: ""
+      url = (uiState as? CreationUiState.Success)?.let {
+        if (it.streamMode == External) it.call.state.ingress.value?.rtmp?.address else null
+      } ?: ""
     )
 
     UrlText(
       modifier = Modifier.weight(1F),
-      url = (uiState as? StreamModeUiState.External)?.broadcast?.streamKey ?: ""
+      url = (uiState as? CreationUiState.Success)?.let {
+        if (it.streamMode == External) it.call.state.ingress.value?.rtmp?.streamKey else null
+      } ?: ""
     )
 
     StreamButton(
-      text = stringResource(id = R.string.livestream_to_backstage)
+      text = stringResource(id = R.string.livestream_to_backstage),
+      enabled = uiState is CreationUiState.Success
     ) {
-      navigator.navigate(
-        LiveShoppingScreen.LiveShopping(cid = , isHost = true)
-      )
+      (uiState as? CreationUiState.Success)?.let {
+        navigator.navigate(
+          LiveShoppingScreen.LiveShopping(cid = it.call.cid, isHost = true)
+        )
+      }
     }
   }
 

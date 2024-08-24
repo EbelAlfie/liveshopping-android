@@ -12,18 +12,18 @@ import javax.inject.Inject
 @HiltViewModel
 class CreationViewModel @Inject constructor() : ViewModel() {
 
-  private val _uiState = MutableStateFlow<StreamModeUiState>(StreamModeUiState.Loading)
+  private val _uiState = MutableStateFlow<CreationUiState>(CreationUiState.Loading)
   val uiState = _uiState.asStateFlow()
 
   suspend fun createCall(type: String) {
-    setState { StreamModeUiState.Loading }
+    setState { CreationUiState.Loading }
 
     val channel = ChatClient
       .instance()
       .createStreamerChannel()
 
     if (channel == null) {
-      setState { StreamModeUiState.Error(Throwable()) }
+      setState { CreationUiState.Error(Throwable()) }
       return
     }
 
@@ -45,27 +45,17 @@ class CreationViewModel @Inject constructor() : ViewModel() {
     }
 
     setState {
-      StreamModeUiState.Internal(call = call)
+      CreationUiState.Success(call = call)
     }
   }
 
-  fun setBroadcastMode(event: StreamChooseEvent) {
+  fun setBroadcastMode(mode: StreamMode) {
     setState {
-      when (event) {
-        StreamChooseEvent.Internal ->
-          (this as? StreamModeUiState.External)?.let {
-            StreamModeUiState.Internal(call = it.call)
-          } ?: this
-
-        StreamChooseEvent.External ->
-          (this as? StreamModeUiState.Internal)?.let {
-            StreamModeUiState.External(call = it.call)
-          } ?: this
-      }
+      (this as? CreationUiState.Success)?.copy (streamMode = mode) ?: this
     }
   }
 
-  private fun setState(reducer: StreamModeUiState.() -> StreamModeUiState) {
+  private fun setState(reducer: CreationUiState.() -> CreationUiState) {
     _uiState.value = _uiState.value.reducer()
   }
 

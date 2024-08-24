@@ -3,23 +3,24 @@ package io.getstream.live.shopping.ui.component
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
-import io.getstream.live.shopping.ui.feature.livecreation.StreamChooseEvent
-import io.getstream.live.shopping.ui.feature.livecreation.StreamModeUiState
+import io.getstream.live.shopping.ui.feature.livecreation.StreamMode
+import io.getstream.live.shopping.ui.feature.livecreation.CreationUiState
 
 @Composable
 fun StreamTab(
-  streamModeUiState: StreamModeUiState,
-  onTabSelected: (StreamChooseEvent) -> Unit
+  creationUiState: CreationUiState,
+  onTabSelected: (StreamMode) -> Unit
 ) {
-  TabRow(selectedTabIndex = streamModeUiState.getIndex()) {
+  val tabIndex = creationUiState.getTabIndex()
+  TabRow(selectedTabIndex = tabIndex) {
     Tab(
-      selected = streamModeUiState is StreamModeUiState.Internal,
-      onClick = { onTabSelected.invoke(StreamChooseEvent.Internal) }
+      selected = tabIndex == StreamMode.Internal.ordinal,
+      onClick = { onTabSelected.invoke(StreamMode.Internal) }
     )
     Tab(
-      selected = streamModeUiState is StreamModeUiState.External,
+      selected = tabIndex == StreamMode.External.ordinal,
       onClick = {
-        onTabSelected.invoke(StreamChooseEvent.External)
+        onTabSelected.invoke(StreamMode.External)
       }
     )
   }
