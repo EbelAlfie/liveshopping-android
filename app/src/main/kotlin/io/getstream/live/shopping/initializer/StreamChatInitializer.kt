@@ -28,6 +28,7 @@ import io.getstream.live.shopping.BuildConfig
 import io.getstream.live.shopping.CredentialsAudience
 import io.getstream.live.shopping.CredentialsHost
 import io.getstream.log.streamLog
+import io.getstream.live.shopping.LiveShoppingApp.HOST
 
 /**
  * StreamChatInitializer initializes all Stream Client components.
@@ -58,11 +59,8 @@ class StreamChatInitializer : Initializer<Unit> {
       .logLevel(logLevel)
       .build()
 
-    if (BuildConfig.HOST) {
-      setCredentialAsHost(chatClient)
-    } else {
-      setCredentialAsAudience(chatClient)
-    }
+    if (HOST) setCredentialAsHost(chatClient)
+    else setCredentialAsAudience(chatClient)
   }
 
   private fun setCredentialAsAudience(chatClient: ChatClient) {

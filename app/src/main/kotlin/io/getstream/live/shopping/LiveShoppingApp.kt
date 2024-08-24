@@ -20,4 +20,8 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class LiveShoppingApp : Application()
+class LiveShoppingApp : Application() {
+  companion object {
+    const val HOST = true
+  }
+}

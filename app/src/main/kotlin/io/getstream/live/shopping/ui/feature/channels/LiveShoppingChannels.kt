@@ -104,7 +104,7 @@ fun LiveShoppingChannels(
                     .instance()
                     .createStreamerChannel() ?: return@launch
                   navigator.navigate(
-                    LiveShoppingScreen.LiveShopping(cid = channel.cid, isHost = true)
+                    LiveShoppingScreen.ChannelCreation
                   )
                 }
               },

@@ -29,4 +29,6 @@
   <string name="livestream_joined_message">Just joined the live</string>
   <string name="follow">Follow</string>
   <string name="buy">Buy</string>
+
+  <string name="livestream_to_backstage">Go to Backstage</string>
 </resources>

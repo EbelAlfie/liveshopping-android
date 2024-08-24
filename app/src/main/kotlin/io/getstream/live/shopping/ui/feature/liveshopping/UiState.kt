@@ -7,7 +7,11 @@ sealed interface LiveShoppingUiState {
 
   data object Loading : LiveShoppingUiState
 
-  data class Success(
+  data class Host(
+    val call: Call
+  ) : LiveShoppingUiState
+
+  data class Audience(
     val call: Call
   ) : LiveShoppingUiState
 

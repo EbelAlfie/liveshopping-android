@@ -16,12 +16,10 @@ android {
   defaultConfig {
     applicationId = "io.getstream.live.shopping"
     minSdk = 24
-    targetSdk = 35
+    targetSdk = 34
     versionCode = 1
     versionName = "1.0"
 
-    buildConfigField("boolean","HOST", "true")
-//    buildConfigField("boolean","HOST", "false")
   }
 
   buildTypes {

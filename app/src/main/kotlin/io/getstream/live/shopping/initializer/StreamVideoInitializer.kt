@@ -25,12 +25,13 @@ import io.getstream.log.streamLog
 import io.getstream.video.android.core.StreamVideoBuilder
 import io.getstream.video.android.core.notifications.NotificationConfig
 import io.getstream.video.android.model.User
+import io.getstream.live.shopping.LiveShoppingApp.HOST
 
 class StreamVideoInitializer : Initializer<Unit> {
 
   override fun create(context: Context) {
     streamLog { "StreamVideoInitializer is initialized" }
-    if (BuildConfig.HOST) {
+    if (HOST) {
       setCredentialAsHost(context)
     } else {
       setCredentialAsAudience(context)

@@ -81,6 +81,13 @@ fun LiveShoppingNavHost(
       }
     }
 
+    composable<LiveShoppingScreen.ChannelCreation> { backStackEntry ->
+      val root: LiveShoppingScreen.ChannelCreation = backStackEntry.toRoute()
+      val context = LocalContext.current
+
+      ChannelCreationScreen()
+    }
+
     composable<LiveShoppingScreen.LiveShopping> { backStackEntry ->
       val root: LiveShoppingScreen.LiveShopping = backStackEntry.toRoute()
       val context = LocalContext.current
