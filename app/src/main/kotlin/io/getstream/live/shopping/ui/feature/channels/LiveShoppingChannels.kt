@@ -100,9 +100,6 @@ fun LiveShoppingChannels(
               .align(Alignment.Center)
               .clickable {
                 scope.launch {
-                  val channel = ChatClient
-                    .instance()
-                    .createStreamerChannel() ?: return@launch
                   navigator.navigate(
                     LiveShoppingScreen.ChannelCreation
                   )

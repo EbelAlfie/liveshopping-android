@@ -31,4 +31,6 @@
   <string name="buy">Buy</string>
 
   <string name="livestream_to_backstage">Go to Backstage</string>
+
+  <string name="stream_creation_title">Choose your software</string>
 </resources>

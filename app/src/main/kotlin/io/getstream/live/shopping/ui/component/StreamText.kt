@@ -12,11 +12,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun UrlText(
+  modifier: Modifier = Modifier,
   url: String
 ) {
   SelectionContainer {
     Text(
-      modifier = Modifier
+      modifier = modifier
         .border(1.dp, Color.DarkGray)
         .background(Color.LightGray)
         .padding(5.dp),

@@ -1,10 +1,19 @@
 package io.getstream.live.shopping.ui.feature.livecreation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import io.getstream.chat.android.ui.common.state.channels.actions.Cancel.channel
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import io.getstream.live.shopping.R
 import io.getstream.live.shopping.ui.component.StreamButton
 import io.getstream.live.shopping.ui.component.StreamTab
@@ -13,25 +22,43 @@ import io.getstream.live.shopping.ui.navigation.LiveShoppingScreen
 import io.getstream.live.shopping.ui.navigation.currentComposeNavigator
 
 @Composable
-fun ChannelCreationScreen() {
+fun ChannelCreationScreen(
+  viewModel: CreationViewModel = hiltViewModel()
+) {
   val navigator = currentComposeNavigator
 
-  Column {
-    Text(text = "Choose your software")
+  val uiState by viewModel.uiState.collectAsState()
 
-    StreamTab()
+  Column (
+    verticalArrangement = Arrangement.spacedBy(10.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Text(
+      text = stringResource(id = R.string.stream_creation_title),
+      fontWeight = FontWeight.Bold,
+      fontSize = 30.sp,
+      color = Color.Black
+    )
 
-    UrlText(url = "")
+    StreamTab(uiState, viewModel::setBroadcastMode)
 
-    UrlText(url = "")
+    UrlText(
+      modifier = Modifier.weight(1F),
+      url = (uiState as? StreamModeUiState.External)?.broadcast?.ingressUrl ?: ""
+    )
 
-    StreamButton(text = stringResource(id = R.string.livestream_to_backstage))
-    {
+    UrlText(
+      modifier = Modifier.weight(1F),
+      url = (uiState as? StreamModeUiState.External)?.broadcast?.streamKey ?: ""
+    )
+
+    StreamButton(
+      text = stringResource(id = R.string.livestream_to_backstage)
+    ) {
       navigator.navigate(
-        LiveShoppingScreen.LiveShopping(cid = channel.cid, isHost = true)
+        LiveShoppingScreen.LiveShopping(cid = , isHost = true)
       )
     }
   }
-
 
 }
