@@ -18,6 +18,7 @@ package io.getstream.live.shopping.ui.feature.liveshopping
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.Component.Factory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.getstream.live.shopping.ProductModel
 import io.getstream.live.shopping.products
@@ -90,5 +91,11 @@ class LiveShoppingViewModel @Inject constructor(
 
   override fun onCleared() {
     super.onCleared()
+  }
+
+
+  @Factory
+  interface VmFactory {
+    fun create(isHost: Boolean): LiveShoppingViewModel
   }
 }
