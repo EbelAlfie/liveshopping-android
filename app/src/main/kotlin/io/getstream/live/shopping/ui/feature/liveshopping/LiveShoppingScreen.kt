@@ -158,7 +158,6 @@ private fun StreamRenderer(
   onPinProductClicked: (String, Call) -> Unit
 ) {
   val context = LocalContext.current
-  var rtmpData by remember { mutableStateOf<RtmpData?>(null) }
 
   LaunchCallPermissions(call = call)
 
@@ -199,14 +198,7 @@ private fun StreamRenderer(
         onPinProductClicked = {
           onPinProductClicked(it, call)
         },
-        onShareClicked = {
-          rtmpData = RtmpData(
-            url = call.state.ingress.value?.rtmp?.address ?: "",
-            streamKey = call.state.ingress.value?.rtmp?.streamKey ?: ""
-          )
-          call.state.ingress.value?.rtmp?.address
-
-        }
+        onShareClicked = {}
       )
     }
   ) {
@@ -231,30 +223,5 @@ private fun StreamRenderer(
       LivestreamPlayer(call = call, overlayContent = {})
     }
 
-    rtmpData?.let {
-      BottomSheet(onDismiss = { rtmpData = null }) {
-        SelectionContainer {
-          Column {
-
-            Text(
-              text = it.url,
-              fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-              text = it.streamKey,
-              fontWeight = FontWeight.Bold
-            )
-          }
-        }
-      }
-    }
-
   }
 }
-
-
-data class RtmpData(
-  val url: String,
-  val streamKey: String
-)
