@@ -11,7 +11,7 @@ sealed interface CreationUiState {
 
   data object Loading: CreationUiState
 
-  data class Error(val error: Throwable): CreationUiState
+  data class Error(val error: Throwable?): CreationUiState
 
   fun getTabIndex() =
     when (this) {

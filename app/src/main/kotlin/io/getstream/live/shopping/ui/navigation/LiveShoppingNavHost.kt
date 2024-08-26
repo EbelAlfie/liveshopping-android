@@ -43,6 +43,7 @@ import io.getstream.chat.android.models.InitializationState
 import io.getstream.chat.android.models.querysort.QuerySortByField
 import io.getstream.live.shopping.ui.component.LiveShoppingLoadingIndicator
 import io.getstream.live.shopping.ui.feature.channels.LiveShoppingChannels
+import io.getstream.live.shopping.ui.feature.livecreation.ChannelCreationScreen
 import io.getstream.live.shopping.ui.feature.liveshopping.LiveShoppingScreen
 import io.getstream.video.android.model.StreamCallId
 
@@ -83,7 +84,6 @@ fun LiveShoppingNavHost(
 
     composable<LiveShoppingScreen.ChannelCreation> { backStackEntry ->
       val root: LiveShoppingScreen.ChannelCreation = backStackEntry.toRoute()
-      val context = LocalContext.current
 
       ChannelCreationScreen()
     }

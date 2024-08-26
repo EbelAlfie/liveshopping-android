@@ -1,12 +1,19 @@
 package io.getstream.live.shopping.ui.feature.livecreation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.live.shopping.chat.createStreamerChannel
+import io.getstream.result.extractCause
+import io.getstream.video.android.core.CreateCallOptions
 import io.getstream.video.android.core.StreamVideo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import org.openapitools.client.models.BroadcastSettingsRequest
+import org.openapitools.client.models.CallSettingsRequest
+import org.openapitools.client.models.VideoSettingsRequest
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,6 +21,12 @@ class CreationViewModel @Inject constructor() : ViewModel() {
 
   private val _uiState = MutableStateFlow<CreationUiState>(CreationUiState.Loading)
   val uiState = _uiState.asStateFlow()
+
+  init {
+    viewModelScope.launch {
+      createCall("livestream")
+    }
+  }
 
   suspend fun createCall(type: String) {
     setState { CreationUiState.Loading }
@@ -44,14 +57,32 @@ class CreationViewModel @Inject constructor() : ViewModel() {
       streamVideo.call(type = type, id = channel.id)
     }
 
-    setState {
-      CreationUiState.Success(call = call)
-    }
+//    call.update(
+//      settingsOverride = CallSettingsRequest(
+//        broadcasting = BroadcastSettingsRequest(
+//          enabled = true
+//        ),
+//        video = VideoSettingsRequest(
+//          cameraDefaultOn = false
+//        )
+//      )
+//    )
+
+    call.camera.setEnabled(enabled = false, fromUser = true)
+
+    call.join(create = true)
+      .onSuccess {
+        setState { CreationUiState.Success(call = call) }
+      }
+      .onError {
+        setState { CreationUiState.Error(it.extractCause()) }
+      }
+
   }
 
   fun setBroadcastMode(mode: StreamMode) {
     setState {
-      (this as? CreationUiState.Success)?.copy (streamMode = mode) ?: this
+      (this as? CreationUiState.Success)?.copy(streamMode = mode) ?: this
     }
   }
 

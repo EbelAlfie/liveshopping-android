@@ -94,8 +94,11 @@ class LiveShoppingViewModel @Inject constructor(
   }
 
 
-  @Factory
-  interface VmFactory {
-    fun create(isHost: Boolean): LiveShoppingViewModel
-  }
+//  companion object {
+//    @Factory
+//    interface VmFactory {
+//      fun create(isHost: Boolean): LiveShoppingViewModel
+//    }
+//  }
+
 }

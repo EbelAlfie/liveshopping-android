@@ -21,17 +21,17 @@ import androidx.startup.Initializer
 import io.getstream.live.shopping.BuildConfig
 import io.getstream.live.shopping.CredentialsAudience
 import io.getstream.live.shopping.CredentialsHost
+import io.getstream.live.shopping.LiveShoppingApp
 import io.getstream.log.streamLog
 import io.getstream.video.android.core.StreamVideoBuilder
 import io.getstream.video.android.core.notifications.NotificationConfig
 import io.getstream.video.android.model.User
-import io.getstream.live.shopping.LiveShoppingApp.HOST
 
 class StreamVideoInitializer : Initializer<Unit> {
 
   override fun create(context: Context) {
     streamLog { "StreamVideoInitializer is initialized" }
-    if (HOST) {
+    if (LiveShoppingApp.HOST) {
       setCredentialAsHost(context)
     } else {
       setCredentialAsAudience(context)

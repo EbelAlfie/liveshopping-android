@@ -1,7 +1,12 @@
 package io.getstream.live.shopping.ui.feature.livecreation
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import io.getstream.chat.android.compose.ui.components.LoadingIndicator
+import io.getstream.chat.android.compose.ui.theme.ChatTheme
 import io.getstream.live.shopping.R
 import io.getstream.live.shopping.ui.component.StreamButton
 import io.getstream.live.shopping.ui.component.StreamTab
@@ -31,6 +38,7 @@ fun ChannelCreationScreen(
   val uiState by viewModel.uiState.collectAsState()
 
   Column (
+    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -44,17 +52,17 @@ fun ChannelCreationScreen(
     StreamTab(uiState, viewModel::setBroadcastMode)
 
     UrlText(
-      modifier = Modifier.weight(1F),
+      modifier = Modifier.fillMaxWidth().weight(1F),
       url = (uiState as? CreationUiState.Success)?.let {
         if (it.streamMode == External) it.call.state.ingress.value?.rtmp?.address else null
-      } ?: ""
+      } ?: "-"
     )
 
     UrlText(
-      modifier = Modifier.weight(1F),
+      modifier = Modifier.fillMaxWidth().weight(1F),
       url = (uiState as? CreationUiState.Success)?.let {
         if (it.streamMode == External) it.call.state.ingress.value?.rtmp?.streamKey else null
-      } ?: ""
+      } ?: "-"
     )
 
     StreamButton(
@@ -68,5 +76,12 @@ fun ChannelCreationScreen(
       }
     }
   }
+
+  if (uiState is CreationUiState.Loading)
+    LoadingIndicator(
+      Modifier
+        .fillMaxSize()
+        .background(ChatTheme.colors.appBackground.copy(alpha = 0.7f))
+    )
 
 }
