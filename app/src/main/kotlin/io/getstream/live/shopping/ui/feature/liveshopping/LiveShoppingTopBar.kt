@@ -90,7 +90,7 @@ internal fun LiveShoppingTopBar(
           scope.launch {
             if (backstage) {
               call.microphone.setEnabled(enabled = true, fromUser = true)
-              call.goLive()
+              call.goLive(startHls = true)
 
               val message = composerViewModel.buildNewMessage(
                 message = context.getString(R.string.livestream_live_started)

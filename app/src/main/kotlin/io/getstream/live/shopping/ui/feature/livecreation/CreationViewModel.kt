@@ -65,7 +65,10 @@ class CreationViewModel @Inject constructor() : ViewModel() {
 
   fun setBroadcastMode(mode: StreamMode) {
     setState {
-      (this as? CreationUiState.Success)?.copy(streamMode = mode) ?: this
+      (this as? CreationUiState.Success)?.let {
+        it.call.camera.setEnabled(enabled = mode == StreamMode.Internal, fromUser = true)
+        it.copy(streamMode = mode)
+      } ?: this
     }
   }
 

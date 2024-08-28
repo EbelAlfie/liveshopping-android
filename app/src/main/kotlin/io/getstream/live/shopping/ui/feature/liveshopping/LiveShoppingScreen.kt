@@ -223,7 +223,7 @@ private fun StreamRenderer(
         }
       )
     } else {
-      LivestreamPlayer(call = call, overlayContent = {})
+      LivestreamPlayer(call = call, enablePausing = true)
     }
 
   }

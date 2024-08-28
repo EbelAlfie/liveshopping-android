@@ -3,7 +3,7 @@ package io.getstream.live.shopping
 object CredentialsHost {
 
   const val TOKEN =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiU2t5UGhlbm9tZW5vbiJ9.htwosMi2COR-lxj-fAlEgOE7cfjmnqDWzNwZ_52kmzw"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiU2t5UGhlbm9tZW5vbiJ9.yLbzecyL7hf4h6-grkfV4OwKihoEqVIH9PSKSXFVFtA"
   const val ID = "SkyPhenomenon"
   const val NAME = "SkyPhenomenon"
   const val AVATAR = "https://i.ytimg.com/vi/8cj4btkOttk/mqdefault.jpg"
