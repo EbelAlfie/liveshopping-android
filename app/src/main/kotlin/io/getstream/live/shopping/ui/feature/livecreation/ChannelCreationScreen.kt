@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,8 +27,10 @@ import io.getstream.live.shopping.ui.component.StreamButton
 import io.getstream.live.shopping.ui.component.StreamTab
 import io.getstream.live.shopping.ui.component.UrlText
 import io.getstream.live.shopping.ui.feature.livecreation.StreamMode.External
+import io.getstream.live.shopping.ui.feature.liveshopping.EnsureVideoCallPermissions
 import io.getstream.live.shopping.ui.navigation.LiveShoppingScreen
 import io.getstream.live.shopping.ui.navigation.currentComposeNavigator
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChannelCreationScreen(
@@ -36,9 +39,18 @@ fun ChannelCreationScreen(
   val navigator = currentComposeNavigator
 
   val uiState by viewModel.uiState.collectAsState()
+  val scope = rememberCoroutineScope()
 
-  Column (
-    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+  EnsureVideoCallPermissions {
+    scope.launch {
+      viewModel.createCall(type = "livestream")
+    }
+  }
+
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(horizontal = 16.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -52,14 +64,18 @@ fun ChannelCreationScreen(
     StreamTab(uiState, viewModel::setBroadcastMode)
 
     UrlText(
-      modifier = Modifier.fillMaxWidth().weight(1F),
+      modifier = Modifier
+        .fillMaxWidth()
+        .weight(1F),
       url = (uiState as? CreationUiState.Success)?.let {
         if (it.streamMode == External) it.call.state.ingress.value?.rtmp?.address else null
       } ?: "-"
     )
 
     UrlText(
-      modifier = Modifier.fillMaxWidth().weight(1F),
+      modifier = Modifier
+        .fillMaxWidth()
+        .weight(1F),
       url = (uiState as? CreationUiState.Success)?.let {
         if (it.streamMode == External) it.call.state.ingress.value?.rtmp?.streamKey else null
       } ?: "-"

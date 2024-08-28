@@ -22,12 +22,6 @@ class CreationViewModel @Inject constructor() : ViewModel() {
   private val _uiState = MutableStateFlow<CreationUiState>(CreationUiState.Loading)
   val uiState = _uiState.asStateFlow()
 
-  init {
-    viewModelScope.launch {
-      createCall("livestream")
-    }
-  }
-
   suspend fun createCall(type: String) {
     setState { CreationUiState.Loading }
 

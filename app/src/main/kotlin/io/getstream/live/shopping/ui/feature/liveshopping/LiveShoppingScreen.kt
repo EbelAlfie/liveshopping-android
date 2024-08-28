@@ -75,6 +75,7 @@ fun LiveShoppingScreen(
 
   val scope = rememberCoroutineScope()
   EnsureVideoCallPermissions {
+    if (!isHost)
     scope.launch {
       livestreamViewModel.joinCall(type = "livestream", id = streamId)
     }
