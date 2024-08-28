@@ -51,18 +51,7 @@ class CreationViewModel @Inject constructor() : ViewModel() {
       streamVideo.call(type = type, id = channel.id)
     }
 
-//    call.update(
-//      settingsOverride = CallSettingsRequest(
-//        broadcasting = BroadcastSettingsRequest(
-//          enabled = true
-//        ),
-//        video = VideoSettingsRequest(
-//          cameraDefaultOn = false
-//        )
-//      )
-//    )
-
-    call.camera.setEnabled(enabled = false, fromUser = true)
+    //call.camera.setEnabled(enabled = false, fromUser = true)
 
     call.join(create = true)
       .onSuccess {

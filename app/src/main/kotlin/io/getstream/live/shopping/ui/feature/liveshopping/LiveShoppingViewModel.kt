@@ -18,7 +18,9 @@ package io.getstream.live.shopping.ui.feature.liveshopping
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.Component.Factory
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.getstream.live.shopping.ProductModel
 import io.getstream.live.shopping.products
@@ -28,10 +30,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.openapitools.client.models.CustomVideoEvent
-import javax.inject.Inject
 
-@HiltViewModel
-class LiveShoppingViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = LiveShoppingViewModel.VMFactory::class)
+class LiveShoppingViewModel @AssistedInject constructor(
+  @Assisted private val isHost: Boolean
 ) : ViewModel() {
   val EXTRA_PRODUCT_ID = "EXTRA_PRODUCT_ID"
   val productList: List<ProductModel> = products
@@ -59,13 +61,26 @@ class LiveShoppingViewModel @Inject constructor(
       // There is no active call, create new call
       streamVideo.call(type = type, id = id)
     }
+
+    if (isHost) {
+      onJoinSuccess(call)
+      return
+    }
+
     val result = call.join(create = true)
     result.onSuccess {
       subscribePinnedProduct(call)
-      liveShoppingUiStateMutableState.value = LiveShoppingUiState.Success(call)
+      onJoinSuccess(call)
     }.onError {
       liveShoppingUiStateMutableState.value = LiveShoppingUiState.Error
     }
+  }
+
+  private fun onJoinSuccess(call: Call) {
+    liveShoppingUiStateMutableState.value = LiveShoppingUiState.Success(
+      isHost = isHost,
+      call = call
+    )
   }
 
   fun pinProduct(productId: String, call: Call) {
@@ -94,11 +109,10 @@ class LiveShoppingViewModel @Inject constructor(
   }
 
 
-//  companion object {
-//    @Factory
-//    interface VmFactory {
-//      fun create(isHost: Boolean): LiveShoppingViewModel
-//    }
-//  }
+
+  @AssistedFactory
+  interface VMFactory {
+    fun create(isHost: Boolean) : LiveShoppingViewModel
+  }
 
 }

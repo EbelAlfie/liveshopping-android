@@ -8,6 +8,7 @@ sealed interface LiveShoppingUiState {
   data object Loading : LiveShoppingUiState
 
   data class Success(
+    val isHost: Boolean,
     val call: Call
   ) : LiveShoppingUiState
 

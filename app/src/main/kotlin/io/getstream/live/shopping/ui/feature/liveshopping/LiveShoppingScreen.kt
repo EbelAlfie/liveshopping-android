@@ -69,13 +69,15 @@ fun LiveShoppingScreen(
   streamId: String,
   listViewModel: MessageListViewModel,
   composerViewModel: MessageComposerViewModel,
-  livestreamViewModel: LiveShoppingViewModel = hiltViewModel()
+  livestreamViewModel: LiveShoppingViewModel = hiltViewModel<LiveShoppingViewModel, LiveShoppingViewModel.VMFactory>
+  { factory ->
+    factory.create(isHost)
+  }
 ) {
   val uiState by livestreamViewModel.liveShoppingUiState.collectAsState()
 
   val scope = rememberCoroutineScope()
   EnsureVideoCallPermissions {
-    if (!isHost)
     scope.launch {
       livestreamViewModel.joinCall(type = "livestream", id = streamId)
     }
